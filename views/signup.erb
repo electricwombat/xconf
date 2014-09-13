@@ -1,0 +1,9 @@
+<p></p>
+<form class="form-signin" role="form" action="/signup" method="post">
+  <input type="email" class="span2" placeholder="Email" name="email">
+  <button type="submit" class="btn">Sign Up</button>
+  <% if flash[:error] %>
+  <p><font color="red"><%= flash[:error] %></font></p>
+  <% else %> <p></p>
+  <% end %>
+</form>

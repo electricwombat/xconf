@@ -1,0 +1,3 @@
+<% @entries.each do |entry| %>
+<p><%= entry.id %> : <%= entry.email %> : <%= entry.token %> : <%= entry.created_at %> : <%=entry.expired %></p>
+<% end %>

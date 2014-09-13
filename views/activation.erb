@@ -1,0 +1,45 @@
+<script type="text/javascript">
+    var RecaptchaOptions = {
+      theme : 'white'
+    };
+</script>
+<div>
+  <p>Please fill in the form below to complete signup!</p>
+</div>
+<div>
+  <form role="form" action="/verify" method="post" onsubmit="return validateForm()" name="activation" autocomplete="off">
+    <div class="row">
+		  <div class="col-xs-6 col-sm-6 col-md-6">
+			  <div class="form-group">
+			    <input type="text" name="first_name" id="first_name" class="form-control input-sm" placeholder="First Name" value="<%= session[:first_name] %>" pattern="\w+" required>
+			  </div>
+			</div>
+			<div class="col-xs-6 col-sm-6 col-md-6">
+			  <div class="form-group">
+			    <input type="text" name="last_name" id="last_name" class="form-control input-sm" placeholder="Last Name" value="<%= session[:last_name] %>" pattern="\w+" required>
+			  </div>
+			</div>
+    </div>
+		<div class="row">
+		  <div class="col-xs-6 col-sm-6 col-md-6">
+			  <div class="form-group">
+			    <input type="password" name="password" id="password" class="form-control input-sm" placeholder="Password" value="<%= session[:password] %>" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}" title="Password must contain a minimum of 8 characters including upper and lowercase letters and numbers" required>
+			  </div>
+			</div>
+			<div class="col-xs-6 col-sm-6 col-md-6">
+			  <div class="form-group">
+			    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control input-sm" placeholder="Confirm Password" value="<%= session[:password] %>" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}" title="Password must contain a minimum of 8 characters including upper and lowercase letters and numbers" required>
+			  </div>
+			</div>
+	  </div>
+    <div class="row" align="center"> 
+      <%= recaptcha_tag(:challenge) %>  
+    </div>
+    <% if flash[:error] %>
+    <p><font color="red"><%= flash[:error] %></font></p>
+    <% else %> <p></p>
+    <% end %>
+		<input type="submit" value="Signup" class="btn">
+  </form>
+</div>
+	    		

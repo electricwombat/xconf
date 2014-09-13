@@ -1,0 +1,12 @@
+<script type="text/javascript">
+ var RecaptchaOptions = {
+    theme : 'white'
+ };
+ </script>
+
+<form class="form-signin" role="form" action="/" method="post">
+  <input type="text" class="span2" name="email">
+  <input type="password" class="span2" name="password">
+  <%= recaptcha_tag(:challenge) %>
+  <button type="submit" class="btn">Go!</button>
+</form>
