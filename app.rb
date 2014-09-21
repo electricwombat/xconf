@@ -13,6 +13,12 @@ helpers Sinatra::MailHelper
 
 enable :sessions
 
+log_file = File.new("#{Dir.pwd}/log/main.log", "a+")
+log_file.sync = true
+$stdout.reopen(log_file)
+$stderr.reopen(log_file)
+
+
 # Set port for compatability with nitrous.io
 configure :development do
   set :bind, '0.0.0.0'
@@ -20,6 +26,7 @@ configure :development do
   set :session_secret, "tcpip123"
   disable :raise_errors
   disable :show_exceptions
+  use Rack::CommonLogger, log_file
 end
 
 # initialize REST API connection
@@ -47,8 +54,10 @@ post '/signup' do
     @activation = Signup.new(:email => @email,:token => @token,:created_at => Time.now)
     if @activation.save
       send_signup_email(@email, @url)
+      logger.info "signup email sent to #{@email} with token #{@token}"
       redirect '/', :notice => "Please check your email to complete signup"
     else
+      logger.error "failed to save entry for #{@email} with token #{@token}"
       redirect '/signup', :error => @activation.errors.full_messages.join(",")
     end
   end
@@ -59,9 +68,11 @@ get '/verify' do
   @token = params[:token] || session[:token]
   @signup = Signup.first(:token => @token)
   if @signup.nil?
+    logger.info "invalid token #{@token}"
     redirect "/not_found", flash[:error] = "Invalid Token" 
   elsif token_expired?
     @signup.destroy
+    logger.info "token expired #{@token}"
     redirect "/not_found", flash[:error] = "Token Expired"
   else 
     session[:email] = @signup[:email]
@@ -78,6 +89,7 @@ post '/verify' do
     @answer = @conn.create_sub(session[:first_name], session[:last_name], session[:email], session[:password])
     send_activation_mail(session[:email], @answer[:firstName], @answer[:conferencePasscode], @answer[:moderatorPasscode])
     @signup = Signup.first(:token => session[:token])
+    logger.info "account no. #{@answer[:popdAccountNum]} created for session[:email]"
     @signup.destroy unless @signup.nil?
     session[:token] = nil
     redirect '/', :notice => "Congratulations, signup complete. Please check your email"
@@ -100,6 +112,7 @@ end
 
 # error hnadling, redirect to /not_found and display error message
 error do
+  logger.error "#{env['sinatra.error'].message}"
   redirect "/not_found", flash[:error] = "#{env['sinatra.error'].message}"
   session[:token] = nil
 end
